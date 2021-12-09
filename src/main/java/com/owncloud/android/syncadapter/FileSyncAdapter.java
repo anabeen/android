@@ -160,7 +160,7 @@ public class FileSyncAdapter extends AbstractOwnCloudSyncAdapter {
 
         this.setAccount(account);
         this.setContentProviderClient(providerClient);
-        this.setStorageManager(new FileDataStorageManager(getUser(), providerClient));
+        this.setStorageManager(new FileDataStorageManager(account, providerClient));
 
         try {
             this.initClientForCurrentAccount();
@@ -480,7 +480,7 @@ public class FileSyncAdapter extends AbstractOwnCloudSyncAdapter {
 
         /// includes a pending intent in the notification showing a more detailed explanation
         Intent explanationIntent = new Intent(getContext(), ErrorsWhileCopyingHandlerActivity.class);
-        explanationIntent.putExtra(ErrorsWhileCopyingHandlerActivity.EXTRA_USER, getUser());
+        explanationIntent.putExtra(ErrorsWhileCopyingHandlerActivity.EXTRA_ACCOUNT, getAccount());
         ArrayList<String> remotePaths = new ArrayList<String>();
         ArrayList<String> localPaths = new ArrayList<String>();
         remotePaths.addAll(mForgottenLocalFiles.keySet());

@@ -2,10 +2,8 @@
  * Nextcloud Android client application
  *
  * @author Álvaro Brey Vilas
- * @author Andy Scherzinger
  * Copyright (C) 2021 Álvaro Brey Vilas
  * Copyright (C) 2021 Nextcloud GmbH
- * Copyright (C) 2015 Andy Scherzinger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,8 +35,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.owncloud.android.R
-import com.owncloud.android.utils.theme.ThemeButtonUtils
 
+/**
+ * Created by scherzia on 29.12.2015.
+ */
 object PermissionUtil {
     const val PERMISSIONS_EXTERNAL_STORAGE = 1
     const val PERMISSIONS_READ_CONTACTS_AUTOMATIC = 2
@@ -117,14 +117,9 @@ object PermissionUtil {
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun requestManageFilesPermission(activity: Activity) {
-        val alertDialog = AlertDialog.Builder(activity, R.style.Theme_ownCloud_Dialog)
+        AlertDialog.Builder(activity, R.style.Theme_ownCloud_Dialog)
             .setTitle(R.string.file_management_permission)
-            .setMessage(
-                String.format(
-                    activity.getString(R.string.file_management_permission_text),
-                    activity.getString(R.string.app_name)
-                )
-            )
+            .setMessage(R.string.file_management_permission_text)
             .setCancelable(false)
             .setPositiveButton(R.string.common_ok) { dialog, _ ->
                 val intent = Intent().apply {
@@ -134,10 +129,7 @@ object PermissionUtil {
                 activity.startActivityForResult(intent, REQUEST_CODE_MANAGE_ALL_FILES)
                 dialog.dismiss()
             }
-            .create()
-
-        alertDialog.show()
-        ThemeButtonUtils.themeBorderlessButton(alertDialog.getButton(AlertDialog.BUTTON_POSITIVE))
+            .show()
     }
 
     /**

@@ -35,8 +35,6 @@ import com.nextcloud.android.lib.resources.profile.Action;
 import com.nextcloud.android.lib.resources.profile.HoverCard;
 import com.nextcloud.client.account.RegisteredUser;
 import com.nextcloud.client.account.Server;
-import com.nextcloud.client.account.User;
-import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.device.DeviceInfo;
 import com.nextcloud.ui.ChooseAccountDialogFragment;
 import com.owncloud.android.AbstractIT;
@@ -177,7 +175,6 @@ public class DialogFragmentIT extends AbstractIT {
     @Test
     @ScreenshotTest
     public void testAccountChooserDialog() throws AccountUtils.AccountNotFoundException {
-        UserAccountManager userAccountManager = activityRule.getActivity().getUserAccountManager();
         AccountManager accountManager = AccountManager.get(targetContext);
         for (Account account : accountManager.getAccountsByType(MainApp.getAccountType(targetContext))) {
             accountManager.removeAccountExplicitly(account);
@@ -188,7 +185,7 @@ public class DialogFragmentIT extends AbstractIT {
         accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_OC_BASE_URL, SERVER_URL);
         accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_USER_ID, "test");
         accountManager.setAuthToken(newAccount, AccountTypeUtils.getAuthTokenTypePass(newAccount.type), "password");
-        User newUser = userAccountManager.getUser(newAccount.name).orElseThrow(RuntimeException::new);
+
 
         Account newAccount2 = new Account("user1@nextcloud.localhost", MainApp.getAccountType(targetContext));
         accountManager.addAccountExplicitly(newAccount2, "password", null);
@@ -197,7 +194,8 @@ public class DialogFragmentIT extends AbstractIT {
         accountManager.setUserData(newAccount2, AccountUtils.Constants.KEY_OC_VERSION, "20.0.0");
         accountManager.setAuthToken(newAccount2, AccountTypeUtils.getAuthTokenTypePass(newAccount.type), "password");
 
-        FileDataStorageManager fileDataStorageManager = new FileDataStorageManager(newUser,
+
+        FileDataStorageManager fileDataStorageManager = new FileDataStorageManager(newAccount,
                                                                                    targetContext.getContentResolver());
 
         OCCapability capability = new OCCapability();
@@ -259,9 +257,7 @@ public class DialogFragmentIT extends AbstractIT {
         accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_USER_ID, "test");
         accountManager.setAuthToken(newAccount, AccountTypeUtils.getAuthTokenTypePass(newAccount.type), "password");
 
-        UserAccountManager userAccountManager = activityRule.getActivity().getUserAccountManager();
-        User newUser = userAccountManager.getUser(newAccount.name).get();
-        FileDataStorageManager fileDataStorageManager = new FileDataStorageManager(newUser,
+        FileDataStorageManager fileDataStorageManager = new FileDataStorageManager(newAccount,
                                                                                    targetContext.getContentResolver());
 
         OCCapability capability = new OCCapability();

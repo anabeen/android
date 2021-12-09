@@ -29,7 +29,6 @@ import android.graphics.Color;
 
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManagerImpl;
-import com.nextcloud.java.util.Optional;
 import com.owncloud.android.R;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.lib.resources.status.OCCapability;
@@ -291,18 +290,18 @@ public final class ThemeColorUtils {
     }
 
     private static OCCapability getCapability(Account acc, Context context) {
-        Optional<User> user = Optional.empty();
+        Account account = null;
 
         if (acc != null) {
-            user = UserAccountManagerImpl.fromContext(context).getUser(acc.name);
+            account = acc;
         } else if (context != null) {
             // TODO: refactor when dark theme work is completed
-            user = Optional.of(UserAccountManagerImpl.fromContext(context).getUser());
+            account = UserAccountManagerImpl.fromContext(context).getCurrentAccount();
         }
 
-        if (user.isPresent()) {
-            FileDataStorageManager storageManager = new FileDataStorageManager(user.get(), context.getContentResolver());
-            return storageManager.getCapability(user.get().getAccountName());
+        if (account != null) {
+            FileDataStorageManager storageManager = new FileDataStorageManager(account, context.getContentResolver());
+            return storageManager.getCapability(account.name);
         } else {
             return new OCCapability();
         }

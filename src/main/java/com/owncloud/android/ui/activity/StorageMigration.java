@@ -30,7 +30,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.os.AsyncTask;
 import android.view.View;
 
-import com.nextcloud.client.account.User;
 import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
 import com.owncloud.android.datamodel.FileDataStorageManager;
@@ -49,7 +48,6 @@ public class StorageMigration {
     private static final String TAG = StorageMigration.class.getName();
 
     private Context mContext;
-    private User user;
     private String mSourceStoragePath;
     private String mTargetStoragePath;
 
@@ -60,9 +58,8 @@ public class StorageMigration {
         void onCancelMigration();
     }
 
-    public StorageMigration(Context context, User user, String sourcePath, String targetPath) {
+    public StorageMigration(Context context, String sourcePath, String targetPath) {
         mContext = context;
-        this.user = user;
         mSourceStoragePath = sourcePath;
         mTargetStoragePath = targetPath;
     }
@@ -79,7 +76,6 @@ public class StorageMigration {
             progressDialog.show();
             new FileMigrationTask(
                     mContext,
-                    user,
                     mSourceStoragePath,
                     mTargetStoragePath,
                     progressDialog,
@@ -122,7 +118,6 @@ public class StorageMigration {
                         progressDialog.show();
                         new StoragePathSwitchTask(
                                 mContext,
-                                user,
                                 mSourceStoragePath,
                                 mTargetStoragePath,
                                 progressDialog,
@@ -139,7 +134,6 @@ public class StorageMigration {
                         progressDialog.show();
                         new FileMigrationTask(
                                 mContext,
-                                user,
                                 mSourceStoragePath,
                                 mTargetStoragePath,
                                 progressDialog,
@@ -173,7 +167,6 @@ public class StorageMigration {
         protected String mStorageSource;
         protected String mStorageTarget;
         protected Context mContext;
-        protected User user;
         protected ProgressDialog mProgressDialog;
         protected StorageMigrationProgressListener mListener;
 
@@ -181,13 +174,11 @@ public class StorageMigration {
         protected Account[] mOcAccounts;
 
         public FileMigrationTaskBase(Context context,
-                                     User user,
                                      String source,
                                      String target,
                                      ProgressDialog progressDialog,
                                      StorageMigrationProgressListener listener) throws SecurityException {
             mContext = context;
-            this.user = user;
             mStorageSource = source;
             mStorageTarget = target;
             mProgressDialog = progressDialog;
@@ -299,12 +290,11 @@ public class StorageMigration {
     static private class StoragePathSwitchTask extends FileMigrationTaskBase {
 
         public StoragePathSwitchTask(Context context,
-                                     User user,
                                      String source,
                                      String target,
                                      ProgressDialog progressDialog,
                                      StorageMigrationProgressListener listener) {
-            super(context, user, source, target, progressDialog, listener);
+            super(context, source, target, progressDialog, listener);
         }
 
         @Override
@@ -347,12 +337,11 @@ public class StorageMigration {
         }
 
         public FileMigrationTask(Context context,
-                                 User user,
                                  String source,
                                  String target,
                                  ProgressDialog progressDialog,
                                  StorageMigrationProgressListener listener) {
-            super(context, user, source, target, progressDialog, listener);
+            super(context, source, target, progressDialog, listener);
         }
 
         @Override
@@ -447,7 +436,8 @@ public class StorageMigration {
         }
 
         private void updateIndex(Context context) throws MigrationException {
-            FileDataStorageManager manager = new FileDataStorageManager(user, context.getContentResolver());
+            final Account nullAccount = null;
+            FileDataStorageManager manager = new FileDataStorageManager(nullAccount, context.getContentResolver());
 
             try {
                 manager.migrateStoredFiles(mStorageSource, mStorageTarget);

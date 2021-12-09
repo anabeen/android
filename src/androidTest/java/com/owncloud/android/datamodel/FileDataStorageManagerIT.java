@@ -217,7 +217,7 @@ abstract public class FileDataStorageManagerIT extends AbstractOnServerIT {
      */
     @Test
     public void testGallerySearch() throws IOException {
-        sut = new FileDataStorageManager(user,
+        sut = new FileDataStorageManager(account,
                                          targetContext
                                              .getContentResolver()
                                              .acquireContentProviderClient(ProviderMeta.ProviderTableMeta.CONTENT_URI)

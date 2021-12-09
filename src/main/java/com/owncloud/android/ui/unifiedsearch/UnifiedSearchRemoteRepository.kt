@@ -24,12 +24,8 @@ package com.owncloud.android.ui.unifiedsearch
 import com.nextcloud.client.account.CurrentAccountProvider
 import com.nextcloud.client.core.AsyncRunner
 import com.nextcloud.client.network.ClientFactory
-import com.nextcloud.common.NextcloudClient
 import com.owncloud.android.lib.common.SearchProviders
 import com.owncloud.android.lib.common.utils.Log_OC
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class UnifiedSearchRemoteRepository(
     private val clientFactory: ClientFactory,
@@ -38,12 +34,6 @@ class UnifiedSearchRemoteRepository(
 ) : IUnifiedSearchRepository {
 
     private var providers: SearchProviders? = null
-
-    private fun runAsyncWithNcClient(callback: (client: NextcloudClient) -> Unit) =
-        CoroutineScope(Dispatchers.IO).launch {
-            val client = clientFactory.createNextcloudClient(currentAccountProvider.user)
-            callback(client)
-        }
 
     override fun queryAll(
         query: String,
@@ -57,31 +47,30 @@ class UnifiedSearchRemoteRepository(
                 val providerIds = result.providers.map { it.id }
                 var openRequests = providerIds.size
                 var anyError = false
-                runAsyncWithNcClient { client ->
-                    providerIds
-                        .forEach { provider ->
-                            val task = SearchOnProviderTask(query, provider, client)
-                            asyncRunner.postQuickTask(
-                                task = task,
-                                onResult = {
-                                    openRequests--
-                                    anyError = anyError || !it.success
-                                    onResult(UnifiedSearchResult(provider, it.success, it.searchResult))
-                                    if (openRequests == 0) {
-                                        onFinished(!anyError)
-                                    }
-                                },
-                                onError = {
-                                    openRequests--
-                                    anyError = true
-                                    onError(it)
-                                    if (openRequests == 0) {
-                                        onFinished(!anyError)
-                                    }
+                val client = clientFactory.createNextcloudClient(currentAccountProvider.user)
+                providerIds
+                    .forEach { provider ->
+                        val task = SearchOnProviderTask(query, provider, client)
+                        asyncRunner.postQuickTask(
+                            task = task,
+                            onResult = {
+                                openRequests--
+                                anyError = anyError || !it.success
+                                onResult(UnifiedSearchResult(provider, it.success, it.searchResult))
+                                if (openRequests == 0) {
+                                    onFinished(!anyError)
                                 }
-                            )
-                        }
-                }
+                            },
+                            onError = {
+                                openRequests--
+                                anyError = true
+                                onError(it)
+                                if (openRequests == 0) {
+                                    onFinished(!anyError)
+                                }
+                            }
+                        )
+                    }
             },
             onError = onError
         )
@@ -99,17 +88,16 @@ class UnifiedSearchRemoteRepository(
             this,
             "queryProvider() called with: query = $query, provider = $provider, cursor = $cursor"
         )
-        runAsyncWithNcClient { client ->
-            val task = SearchOnProviderTask(query, provider, client, cursor)
-            asyncRunner.postQuickTask(
-                task,
-                onResult = {
-                    onResult(UnifiedSearchResult(provider, it.success, it.searchResult))
-                    onFinished(it.success)
-                },
-                onError
-            )
-        }
+        val client = clientFactory.createNextcloudClient(currentAccountProvider.user)
+        val task = SearchOnProviderTask(query, provider, client, cursor)
+        asyncRunner.postQuickTask(
+            task,
+            onResult = {
+                onResult(UnifiedSearchResult(provider, it.success, it.searchResult))
+                onFinished(it.success)
+            },
+            onError
+        )
     }
 
     fun fetchProviders(onResult: (SearchProviders) -> Unit, onError: (Throwable) -> Unit) {
@@ -117,14 +105,13 @@ class UnifiedSearchRemoteRepository(
         if (this.providers != null) {
             onResult(this.providers!!)
         } else {
-            runAsyncWithNcClient { client ->
-                val task = GetSearchProvidersTask(client)
-                asyncRunner.postQuickTask(
-                    task,
-                    onResult = { onResult(it.providers) },
-                    onError = onError
-                )
-            }
+            val client = clientFactory.createNextcloudClient(currentAccountProvider.user)
+            val task = GetSearchProvidersTask(client)
+            asyncRunner.postQuickTask(
+                task,
+                onResult = { onResult(it.providers) },
+                onError = onError
+            )
         }
     }
 }

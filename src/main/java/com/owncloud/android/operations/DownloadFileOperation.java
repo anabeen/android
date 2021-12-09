@@ -26,7 +26,6 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
-import com.nextcloud.client.account.User;
 import com.owncloud.android.datamodel.DecryptedFolderMetadata;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.datamodel.OCFile;
@@ -53,7 +52,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class DownloadFileOperation extends RemoteOperation {
     private static final String TAG = DownloadFileOperation.class.getSimpleName();
 
-    private User user;
+    private Account account;
     private OCFile file;
     private String behaviour;
     private String etag = "";
@@ -67,10 +66,10 @@ public class DownloadFileOperation extends RemoteOperation {
 
     private final AtomicBoolean cancellationRequested = new AtomicBoolean(false);
 
-    public DownloadFileOperation(User user, OCFile file, String behaviour, String activityName,
+    public DownloadFileOperation(Account account, OCFile file, String behaviour, String activityName,
                                  String packageName, Context context) {
-        if (user == null) {
-            throw new IllegalArgumentException("Illegal null user in DownloadFileOperation " +
+        if (account == null) {
+            throw new IllegalArgumentException("Illegal null account in DownloadFileOperation " +
                     "creation");
         }
         if (file == null) {
@@ -78,7 +77,7 @@ public class DownloadFileOperation extends RemoteOperation {
                     "creation");
         }
 
-        this.user = user;
+        this.account = account;
         this.file = file;
         this.behaviour = behaviour;
         this.activityName = activityName;
@@ -86,8 +85,8 @@ public class DownloadFileOperation extends RemoteOperation {
         this.context = context;
     }
 
-    public DownloadFileOperation(User user, OCFile file, Context context) {
-        this(user, file, null, null, null, context);
+    public DownloadFileOperation(Account account, OCFile file, Context context) {
+        this(account, file, null, null, null, context);
     }
 
     public String getSavePath() {
@@ -101,15 +100,15 @@ public class DownloadFileOperation extends RemoteOperation {
                 return path.getAbsolutePath();
             }
         }
-        return FileStorageUtils.getDefaultSavePathFor(user.getAccountName(), file);
+        return FileStorageUtils.getDefaultSavePathFor(account.name, file);
     }
 
     public String getTmpPath() {
-        return FileStorageUtils.getTemporalPath(user.getAccountName()) + file.getRemotePath();
+        return FileStorageUtils.getTemporalPath(account.name) + file.getRemotePath();
     }
 
     public String getTmpFolder() {
-        return FileStorageUtils.getTemporalPath(user.getAccountName());
+        return FileStorageUtils.getTemporalPath(account.name);
     }
 
     public String getRemotePath() {
@@ -178,14 +177,11 @@ public class DownloadFileOperation extends RemoteOperation {
 
             // decrypt file
             if (file.isEncrypted()) {
-                FileDataStorageManager fileDataStorageManager = new FileDataStorageManager(user, context.getContentResolver());
+                FileDataStorageManager fileDataStorageManager = new FileDataStorageManager(account, context.getContentResolver());
 
                 OCFile parent = fileDataStorageManager.getFileByPath(file.getParentRemotePath());
 
-                DecryptedFolderMetadata metadata = EncryptionUtils.downloadFolderMetadata(parent,
-                                                                                          client,
-                                                                                          context,
-                                                                                          user.toPlatformAccount());
+                DecryptedFolderMetadata metadata = EncryptionUtils.downloadFolderMetadata(parent, client, context, account);
 
                 if (metadata == null) {
                     return new RemoteOperationResult(RemoteOperationResult.ResultCode.METADATA_NOT_FOUND);
@@ -239,13 +235,8 @@ public class DownloadFileOperation extends RemoteOperation {
         }
     }
 
-    @Deprecated
     public Account getAccount() {
-        return this.user.toPlatformAccount();
-    }
-
-    public User getUser() {
-        return this.user;
+        return this.account;
     }
 
     public OCFile getFile() {

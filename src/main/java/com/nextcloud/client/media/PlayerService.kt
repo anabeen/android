@@ -91,7 +91,6 @@ class PlayerService : Service() {
 
     private lateinit var player: Player
     private lateinit var notificationBuilder: NotificationCompat.Builder
-    private var isRunning = false
 
     override fun onCreate() {
         super.onCreate()
@@ -170,7 +169,6 @@ class PlayerService : Service() {
         }
 
         startForeground(R.string.media_notif_ticker, notificationBuilder.build())
-        isRunning = true
     }
 
     private fun stopServiceAndRemoveNotification(file: OCFile?) {
@@ -180,10 +178,7 @@ class PlayerService : Service() {
             player.stop(file)
         }
 
-        if (isRunning) {
-            stopForeground(true)
-            stopSelf()
-            isRunning = false
-        }
+        stopSelf()
+        stopForeground(true)
     }
 }

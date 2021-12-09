@@ -2182,10 +2182,13 @@ public class FileDisplayActivity extends FileActivity
         }
         if (showPreview && file.isDown() && !file.isDownloading() || streamMedia) {
             showSortListGroup(false);
+            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) findViewById(R.id.root_layout).getLayoutParams();
+            params.setBehavior(null);
+
             Fragment mediaFragment = PreviewMediaFragment.newInstance(file, user.get(), startPlaybackPosition, autoplay);
             setLeftFragment(mediaFragment);
-            binding.rightFragmentContainer.setVisibility(View.GONE);
-            super.updateActionBarTitleAndHomeButton(file);
+            updateActionBarTitleAndHomeButton(file);
+            setFile(file);
         } else {
             Intent previewIntent = new Intent();
             previewIntent.putExtra(EXTRA_FILE, file);

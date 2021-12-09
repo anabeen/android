@@ -41,7 +41,6 @@ import android.util.Pair;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.files.downloader.DownloadTask;
-import com.nextcloud.java.util.Optional;
 import com.owncloud.android.R;
 import com.owncloud.android.authentication.AuthenticatorActivity;
 import com.owncloud.android.datamodel.FileDataStorageManager;
@@ -105,7 +104,7 @@ public class FileDownloader extends Service
     private ServiceHandler mServiceHandler;
     private IBinder mBinder;
     private OwnCloudClient mDownloadClient;
-    private Optional<User> currentUser;
+    private Account mCurrentAccount;
     private FileDataStorageManager mStorageManager;
 
     private IndexedForest<DownloadFileOperation> mPendingDownloads = new IndexedForest<>();
@@ -211,7 +210,7 @@ public class FileDownloader extends Service
             conflictUploadId = intent.getLongExtra(ConflictsResolveActivity.EXTRA_CONFLICT_UPLOAD_ID, -1);
             AbstractList<String> requestedDownloads = new Vector<String>();
             try {
-                DownloadFileOperation newDownload = new DownloadFileOperation(user,
+                DownloadFileOperation newDownload = new DownloadFileOperation(user.toPlatformAccount(),
                                                                               file,
                                                                               behaviour,
                                                                               activityName,
@@ -304,9 +303,9 @@ public class FileDownloader extends Service
             if (download != null) {
                 download.cancel();
             } else {
-                if (mCurrentDownload != null && currentUser.isPresent() &&
+                if (mCurrentDownload != null && mCurrentAccount != null &&
                     mCurrentDownload.getRemotePath().startsWith(file.getRemotePath()) &&
-                        account.name.equals(currentUser.get().getAccountName())) {
+                        account.name.equals(mCurrentAccount.name)) {
                     mCurrentDownload.cancel();
                 }
             }
@@ -457,16 +456,18 @@ public class FileDownloader extends Service
                 RemoteOperationResult downloadResult = null;
                 try {
                     /// prepare client object to send the request to the ownCloud server
-                    Account currentDownloadAccount = mCurrentDownload.getAccount();
-                    Optional<User> currentDownloadUser = accountManager.getUser(currentDownloadAccount.name);
-                    if (!currentUser.equals(currentDownloadUser)) {
-                        currentUser = currentDownloadUser;
-                        mStorageManager = new FileDataStorageManager(currentUser.get(), getContentResolver());
+                    if (mCurrentAccount == null ||
+                            !mCurrentAccount.equals(mCurrentDownload.getAccount())) {
+                        mCurrentAccount = mCurrentDownload.getAccount();
+                        mStorageManager = new FileDataStorageManager(
+                                mCurrentAccount,
+                                getContentResolver()
+                        );
                     }   // else, reuse storage manager from previous operation
 
                     // always get client from client manager, to get fresh credentials in case
                     // of update
-                    OwnCloudAccount ocAccount = currentDownloadUser.get().toOwnCloudAccount();
+                    OwnCloudAccount ocAccount = new OwnCloudAccount(mCurrentAccount, this);
                     mDownloadClient = OwnCloudClientManagerFactory.getDefaultSingleton().
                             getClientFor(ocAccount, this);
 
@@ -483,7 +484,7 @@ public class FileDownloader extends Service
 
                 } finally {
                     Pair<DownloadFileOperation, String> removeResult = mPendingDownloads.removePayload(
-                        currentUser.get().getAccountName(), mCurrentDownload.getRemotePath());
+                        mCurrentAccount.name, mCurrentDownload.getRemotePath());
 
                     if (downloadResult == null) {
                         downloadResult = new RemoteOperationResult(new RuntimeException("Error downloading…"));
