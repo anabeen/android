@@ -1480,8 +1480,7 @@ public class OCFileListFragment extends ExtendedListFragment implements
             RemoteOperationResult remoteOperationResult = toggleFavoriteOperation.execute(client);
 
             if (remoteOperationResult.isSuccess()) {
-                boolean removeFromList = currentSearchType == SearchType.FAVORITE_SEARCH && !event.shouldFavorite;
-                mAdapter.setFavoriteAttributeForItemID(event.remoteId, event.shouldFavorite, removeFromList);
+                mAdapter.setFavoriteAttributeForItemID(event.remoteId, event.shouldFavorite);
             }
 
         } catch (ClientFactory.CreationException e) {
@@ -1542,8 +1541,6 @@ public class OCFileListFragment extends ExtendedListFragment implements
 
                     if (remoteOperationResult.isSuccess() && remoteOperationResult.getResultData() != null
                         && !isCancelled() && searchFragment) {
-                        searchEvent = event;
-                        
                         if (remoteOperationResult.getResultData() == null || ((List) remoteOperationResult.getResultData()).isEmpty()) {
                             setEmptyView(event);
                         } else {
@@ -1552,6 +1549,7 @@ public class OCFileListFragment extends ExtendedListFragment implements
                                              storageManager,
                                              mFile,
                                              true);
+                            searchEvent = event;
                         }
 
                         final ToolbarActivity fileDisplayActivity = (ToolbarActivity) getActivity();

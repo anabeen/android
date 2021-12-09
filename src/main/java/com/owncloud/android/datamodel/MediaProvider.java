@@ -96,9 +96,9 @@ public final class MediaProvider {
             // since sdk 29 we have to manually distinct on bucket id
             while (cursorFolders.moveToNext()) {
                 uniqueFolders.put(cursorFolders.getString(
-                    cursorFolders.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_ID)),
+                    cursorFolders.getColumnIndex(MediaStore.Images.Media.BUCKET_ID)),
                                   cursorFolders.getString(
-                                      cursorFolders.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME))
+                                      cursorFolders.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME))
                 );
             }
             cursorFolders.close();
@@ -214,9 +214,9 @@ public final class MediaProvider {
             // since sdk 29 we have to manually distinct on bucket id
             while (cursorFolders.moveToNext()) {
                 uniqueFolders.put(cursorFolders.getString(
-                    cursorFolders.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_ID)),
+                    cursorFolders.getColumnIndex(MediaStore.Video.Media.BUCKET_ID)),
                                   cursorFolders.getString(
-                                      cursorFolders.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME))
+                                      cursorFolders.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME))
                 );
             }
             cursorFolders.close();

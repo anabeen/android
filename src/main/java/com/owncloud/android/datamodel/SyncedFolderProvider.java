@@ -333,32 +333,32 @@ public class SyncedFolderProvider extends Observable {
     private SyncedFolder createSyncedFolderFromCursor(Cursor cursor) {
         SyncedFolder syncedFolder = null;
         if (cursor != null) {
-            long id = cursor.getLong(cursor.getColumnIndexOrThrow(ProviderMeta.ProviderTableMeta._ID));
-            String localPath = cursor.getString(cursor.getColumnIndexOrThrow(
+            long id = cursor.getLong(cursor.getColumnIndex(ProviderMeta.ProviderTableMeta._ID));
+            String localPath = cursor.getString(cursor.getColumnIndex(
                     ProviderMeta.ProviderTableMeta.SYNCED_FOLDER_LOCAL_PATH));
-            String remotePath = cursor.getString(cursor.getColumnIndexOrThrow(
+            String remotePath = cursor.getString(cursor.getColumnIndex(
                     ProviderMeta.ProviderTableMeta.SYNCED_FOLDER_REMOTE_PATH));
-            boolean wifiOnly = cursor.getInt(cursor.getColumnIndexOrThrow(
+            boolean wifiOnly = cursor.getInt(cursor.getColumnIndex(
                     ProviderMeta.ProviderTableMeta.SYNCED_FOLDER_WIFI_ONLY)) == 1;
-            boolean chargingOnly = cursor.getInt(cursor.getColumnIndexOrThrow(
+            boolean chargingOnly = cursor.getInt(cursor.getColumnIndex(
                     ProviderMeta.ProviderTableMeta.SYNCED_FOLDER_CHARGING_ONLY)) == 1;
-            boolean existing = cursor.getInt(cursor.getColumnIndexOrThrow(
+            boolean existing = cursor.getInt(cursor.getColumnIndex(
                     ProviderMeta.ProviderTableMeta.SYNCED_FOLDER_EXISTING)) == 1;
-            boolean subfolderByDate = cursor.getInt(cursor.getColumnIndexOrThrow(
+            boolean subfolderByDate = cursor.getInt(cursor.getColumnIndex(
                     ProviderMeta.ProviderTableMeta.SYNCED_FOLDER_SUBFOLDER_BY_DATE)) == 1;
-            String accountName = cursor.getString(cursor.getColumnIndexOrThrow(
+            String accountName = cursor.getString(cursor.getColumnIndex(
                     ProviderMeta.ProviderTableMeta.SYNCED_FOLDER_ACCOUNT));
-            int uploadAction = cursor.getInt(cursor.getColumnIndexOrThrow(
+            int uploadAction = cursor.getInt(cursor.getColumnIndex(
                     ProviderMeta.ProviderTableMeta.SYNCED_FOLDER_UPLOAD_ACTION));
-            int nameCollisionPolicy = cursor.getInt(cursor.getColumnIndexOrThrow(
+            int nameCollisionPolicy = cursor.getInt(cursor.getColumnIndex(
                 ProviderMeta.ProviderTableMeta.SYNCED_FOLDER_NAME_COLLISION_POLICY));
-            boolean enabled = cursor.getInt(cursor.getColumnIndexOrThrow(
+            boolean enabled = cursor.getInt(cursor.getColumnIndex(
                     ProviderMeta.ProviderTableMeta.SYNCED_FOLDER_ENABLED)) == 1;
-            long enabledTimestampMs = cursor.getLong(cursor.getColumnIndexOrThrow(
+            long enabledTimestampMs = cursor.getLong(cursor.getColumnIndex(
                     ProviderMeta.ProviderTableMeta.SYNCED_FOLDER_ENABLED_TIMESTAMP_MS));
-            MediaFolderType type = MediaFolderType.getById(cursor.getInt(cursor.getColumnIndexOrThrow(
+            MediaFolderType type = MediaFolderType.getById(cursor.getInt(cursor.getColumnIndex(
                     ProviderMeta.ProviderTableMeta.SYNCED_FOLDER_TYPE)));
-            boolean hidden = cursor.getInt(cursor.getColumnIndexOrThrow(
+            boolean hidden = cursor.getInt(cursor.getColumnIndex(
                 ProviderMeta.ProviderTableMeta.SYNCED_FOLDER_HIDDEN)) == 1;
 
             syncedFolder = new SyncedFolder(id,

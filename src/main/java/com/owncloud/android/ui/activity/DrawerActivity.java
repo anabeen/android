@@ -104,7 +104,6 @@ import com.owncloud.android.ui.fragment.GalleryFragment;
 import com.owncloud.android.ui.fragment.OCFileListFragment;
 import com.owncloud.android.ui.preview.PreviewTextStringFragment;
 import com.owncloud.android.ui.trashbin.TrashbinActivity;
-import com.owncloud.android.utils.BitmapUtils;
 import com.owncloud.android.utils.DisplayUtils;
 import com.owncloud.android.utils.DrawerMenuUtil;
 import com.owncloud.android.utils.FilesSyncHelper;
@@ -150,7 +149,6 @@ public abstract class DrawerActivity extends ToolbarActivity
     private static final int ACTION_MANAGE_ACCOUNTS = 101;
     private static final int MENU_ORDER_EXTERNAL_LINKS = 3;
     private static final int MENU_ITEM_EXTERNAL_LINK = 111;
-    private static final int MAX_LOGO_SIZE_PX = 1000;
 
     /**
      * Reference to the drawer layout.
@@ -326,16 +324,7 @@ public abstract class DrawerActivity extends ToolbarActivity
                 SimpleTarget target = new SimpleTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation glideAnimation) {
-
-                        Bitmap logo = resource;
-                        int width = resource.getWidth();
-                        int height = resource.getHeight();
-                        int max = Math.max(width, height);
-                        if (max > MAX_LOGO_SIZE_PX) {
-                            logo = BitmapUtils.scaleBitmap(resource, MAX_LOGO_SIZE_PX, width, height, max);
-                        }
-
-                        Drawable[] drawables = {new ColorDrawable(primaryColor), new BitmapDrawable(logo)};
+                        Drawable[] drawables = {new ColorDrawable(primaryColor), new BitmapDrawable(resource)};
                         LayerDrawable layerDrawable = new LayerDrawable(drawables);
 
                         String name = capability.getServerName();
@@ -374,7 +363,7 @@ public abstract class DrawerActivity extends ToolbarActivity
         }
 
     }
-
+    
     /**
      * setup drawer header, basically the logo color
      */
@@ -984,7 +973,7 @@ public abstract class DrawerActivity extends ToolbarActivity
         Fragment fileDetailsSharingProcessFragment =
             getSupportFragmentManager().findFragmentByTag(FileDetailsSharingProcessFragment.TAG);
         if (fileDetailsSharingProcessFragment != null) {
-            ((FileDetailsSharingProcessFragment) fileDetailsSharingProcessFragment).onBackPressed();
+            ((FileDetailsSharingProcessFragment)fileDetailsSharingProcessFragment).onBackPressed();
         } else {
             super.onBackPressed();
         }

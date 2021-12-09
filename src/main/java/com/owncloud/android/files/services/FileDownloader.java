@@ -105,7 +105,7 @@ public class FileDownloader extends Service
     private ServiceHandler mServiceHandler;
     private IBinder mBinder;
     private OwnCloudClient mDownloadClient;
-    private Optional<User> currentUser = Optional.empty();
+    private Optional<User> currentUser;
     private FileDataStorageManager mStorageManager;
 
     private IndexedForest<DownloadFileOperation> mPendingDownloads = new IndexedForest<>();
@@ -483,7 +483,7 @@ public class FileDownloader extends Service
 
                 } finally {
                     Pair<DownloadFileOperation, String> removeResult = mPendingDownloads.removePayload(
-                        mCurrentDownload.getUser().getAccountName(), mCurrentDownload.getRemotePath());
+                        currentUser.get().getAccountName(), mCurrentDownload.getRemotePath());
 
                     if (downloadResult == null) {
                         downloadResult = new RemoteOperationResult(new RuntimeException("Error downloading…"));

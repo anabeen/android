@@ -187,10 +187,12 @@ public class UploadListActivity extends FileActivity {
         // retry failed uploads
         new Thread(() -> FileUploader.retryFailedUploads(
             this,
+            null,
             uploadsStorageManager,
             connectivityService,
             userAccountManager,
-            powerManagementService
+            powerManagementService,
+            null
         )).start();
 
         // update UI

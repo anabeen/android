@@ -40,8 +40,8 @@ public class GetCapabilitiesOperation extends SyncOperation {
         final FileDataStorageManager storageManager = getStorageManager();
 
         OCCapability currentCapability = null;
-        if (!storageManager.getUser().isAnonymous()) {
-            currentCapability = storageManager.getCapability(storageManager.getUser().getAccountName());
+        if (storageManager.getAccount() != null) {
+            currentCapability = storageManager.getCapability(storageManager.getAccount().name);
         }
 
         RemoteOperationResult result = new GetCapabilitiesRemoteOperation(currentCapability).execute(client);
