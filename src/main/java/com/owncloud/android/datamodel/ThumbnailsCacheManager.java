@@ -1077,11 +1077,21 @@ public final class ThumbnailsCacheManager {
         Drawable playButtonDrawable = ResourcesCompat.getDrawable(MainApp.getAppContext().getResources(),
                                                                   R.drawable.view_play,
                                                                   null);
+
+        Drawable fullScreenButtonDrawable = ResourcesCompat.getDrawable(MainApp.getAppContext().getResources(), R.drawable.ic_baseline_fullscreen,
+                                                                        null);
+
         Bitmap playButton = BitmapUtils.drawableToBitmap(playButtonDrawable);
+
+        Bitmap fullScreenButton = BitmapUtils.drawableToBitmap(fullScreenButtonDrawable);
 
         Bitmap resizedPlayButton = Bitmap.createScaledBitmap(playButton,
                                                              (int) (thumbnail.getWidth() * 0.3),
                                                              (int) (thumbnail.getHeight() * 0.3), true);
+
+        Bitmap resizedFullScreenButton = Bitmap.createScaledBitmap(fullScreenButton,
+                                                                   (int) (thumbnail.getWidth() * 0.3),
+                                                                   (int) (thumbnail.getHeight() * 0.3), true);
 
         Bitmap resultBitmap = Bitmap.createBitmap(thumbnail.getWidth(),
                                                   thumbnail.getHeight(),
@@ -1115,6 +1125,9 @@ public final class ThumbnailsCacheManager {
 
         c.drawBitmap(resizedPlayButton, (float) ((thumbnail.getWidth() / 2) + ox),
                 (float) ((thumbnail.getHeight() / 2) - ym), p);
+
+        c.drawBitmap(resizedFullScreenButton, (float) (thumbnail.getWidth() - 1),
+                     (float) (thumbnail.getHeight()-1), p );
 
         return resultBitmap;
     }

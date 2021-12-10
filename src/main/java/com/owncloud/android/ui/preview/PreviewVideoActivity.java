@@ -21,6 +21,7 @@
 package com.owncloud.android.ui.preview;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
@@ -89,6 +90,7 @@ public class PreviewVideoActivity extends FileActivity implements OnCompletionLi
         StyledPlayerView playerView = findViewById(R.id.videoPlayer);
         exoPlayer = new SimpleExoPlayer.Builder(this).build();
         playerView.setPlayer(exoPlayer);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         if (mSavedPlaybackPosition >= 0) {
             exoPlayer.seekTo(mSavedPlaybackPosition);
